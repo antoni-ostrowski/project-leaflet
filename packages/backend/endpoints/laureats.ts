@@ -10,7 +10,9 @@ const laureatsListSchema = Schema.Struct({
   category: Schema.optional(Schema.String),
   year: Schema.optional(Schema.NumberFromString),
   country: Schema.optional(Schema.String),
-  search: Schema.optional(Schema.String)
+  search: Schema.optional(Schema.String),
+  page: Schema.optional(Schema.NumberFromString),
+  limit: Schema.optional(Schema.NumberFromString)
 })
 
 router.get("/", async (req, res) => {
@@ -40,9 +42,28 @@ router.get("/", async (req, res) => {
 
     yield* Effect.logInfo({ searchParams, query })
 
-    const laureates = yield* effectifyPromise(() => nobels.find(query).toArray())
+    const page = searchParams.page ?? 1
+    const limit = searchParams.limit ?? 0
+    const skip = (page - 1) * (limit || 0)
 
-    return laureates
+    let queryBuilder = nobels.find(query)
+    if (limit > 0) {
+      queryBuilder = queryBuilder.skip(skip).limit(limit)
+    }
+
+    const laureates = yield* effectifyPromise(() => queryBuilder.toArray())
+    const totalCount = yield* effectifyPromise(() => nobels.countDocuments(query))
+
+    return {
+      data: laureates,
+      pagination: {
+        page,
+        limit,
+        totalCount,
+        totalPages: limit > 0 ? Math.ceil(totalCount / limit) : 1,
+        hasMore: limit > 0 ? skip + limit < totalCount : false
+      }
+    }
   })
 
   const result = await Effect.runPromise(program)
@@ -55,7 +76,8 @@ router.get("/:id", async (req, res) => {
     const query = { id: id }
     const nobel = yield* effectifyPromise(() => nobels.findOne(query))
     if (!nobel) {
-      res.status(404).json("lauratee not found")
+      res.status(404).json("laureate not found")
+      return null
     }
     return nobel
   })

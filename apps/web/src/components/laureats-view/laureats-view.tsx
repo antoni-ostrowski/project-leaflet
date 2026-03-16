@@ -1,5 +1,6 @@
-import { useListLaureates } from "@/hooks/use-laureates"
+import { useListLaureatesInfinite } from "@/hooks/use-laureates"
 import { useDebouncedValue } from "@tanstack/react-pacer"
+import { Button } from "@/components/ui/button"
 import { Laureate } from "backend/schemas"
 import { Loader2, Users } from "lucide-react"
 import { useState, useMemo } from "react"
@@ -22,20 +23,30 @@ export function LaureateList() {
     (state) => ({ isPending: state.isPending })
   )
 
-  const { data: apiData, isLoading } = useListLaureates({
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading
+  } = useListLaureatesInfinite({
     category: selectedCategory === "all" ? undefined : selectedCategory,
     search: debouncedSearch || undefined
   })
 
+  const allLaureates = useMemo(() => {
+    if (!data) return []
+    return data.pages.flatMap((page) => page.data)
+  }, [data])
+
   const filteredLaureates = useMemo(() => {
-    if (!apiData) return []
-    return apiData.filter((laureate) => {
+    return allLaureates.filter((laureate) => {
       const matchesYear = laureate.prizes.some(
         (prize) => parseInt(prize.year) >= yearRange[0] && parseInt(prize.year) <= yearRange[1]
       )
       return matchesYear
     })
-  }, [apiData, yearRange])
+  }, [allLaureates, yearRange])
 
   const handleCardClick = (laureate: Laureate) => {
     setSelectedLaureate(laureate)
@@ -94,6 +105,28 @@ export function LaureateList() {
               <p className="text-muted-foreground">No laureates found matching your criteria.</p>
             </div>
           )}
+
+          <div className="flex justify-center py-8">
+            {hasNextPage && (
+              <Button
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                variant="outline"
+              >
+                {isFetchingNextPage ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  "Load More"
+                )}
+              </Button>
+            )}
+            {!hasNextPage && allLaureates.length > 0 && (
+              <p className="text-muted-foreground text-sm">No more laureates to load</p>
+            )}
+          </div>
 
           <LaureateDetail
             laureate={selectedLaureate}
