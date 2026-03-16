@@ -1,7 +1,8 @@
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Calendar, MapPin, Quote } from "lucide-react"
 import { Laureate } from "backend/schemas"
+import { Calendar, MapPin, Quote } from "lucide-react"
+
 import { categoryColors, categoryDisplayNames, Category } from "./utils"
 
 interface LaureateCardProps {
@@ -14,7 +15,7 @@ export function LaureateCard({ laureate, onClick }: LaureateCardProps) {
   const prizes = laureate.prizes
   const countryCode = laureate.bornCountryCode?.toLowerCase() ?? "unknown"
   const country = laureate.bornCountry ?? "Unknown"
-  
+
   return (
     <Card
       className="group bg-card hover:bg-secondary/50 border-border hover:border-primary/50 hover:shadow-primary/5 cursor-pointer transition-all duration-200 hover:shadow-lg"
@@ -29,7 +30,7 @@ export function LaureateCard({ laureate, onClick }: LaureateCardProps) {
               className="h-5 w-7 rounded-sm object-cover shadow-sm"
             />
             <div>
-              <h3 className="text-foreground group-hover:text-primary line-clamp-1 font-semibold transition-colors">
+              <h3 className="group-hover:text-primary line-clamp-1 font-semibold transition-colors">
                 {fullName}
               </h3>
               <p className="text-muted-foreground flex items-center gap-1 text-xs">

@@ -1,19 +1,31 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import * as React from "react"
+import { FormLabel, FormLabelProps } from "@mui/material"
+import { forwardRef } from "react"
 
-function Label({ className, ...props }: React.ComponentProps<"label">) {
-  return (
-    <label
-      data-slot="label"
-      className={cn(
-        "flex items-center gap-2 text-xs/relaxed leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
-        className
-      )}
-      {...props}
-    />
-  )
-}
+interface LabelProps extends FormLabelProps {}
+
+const Label = forwardRef<HTMLLabelElement, LabelProps>(
+  ({ className, ...props }, ref) => {
+    return (
+      <FormLabel
+        ref={ref}
+        data-slot="label"
+        className={cn(
+          "flex items-center gap-2 text-xs/relaxed leading-none font-medium select-none",
+          className
+        )}
+        sx={{
+          fontSize: "inherit",
+          lineHeight: "inherit",
+        }}
+        {...props}
+      />
+    )
+  }
+)
+
+Label.displayName = "Label"
 
 export { Label }

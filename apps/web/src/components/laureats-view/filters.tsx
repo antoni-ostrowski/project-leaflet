@@ -1,12 +1,7 @@
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select"
+import { Select, SelectItem } from "@/components/ui/select"
+import { InputLabel as MuiInputLabel } from "@mui/material"
 import { Search } from "lucide-react"
 import { categories, categoryDisplayNames, Category } from "./utils"
 
@@ -47,61 +42,49 @@ export function FilterPanel({
         </div>
 
         <div className="space-y-1.5">
-          <Label className="text-muted-foreground text-xs">Category</Label>
+          <MuiInputLabel className="text-muted-foreground text-xs">Category</MuiInputLabel>
           <Select
             value={selectedCategory}
-            onValueChange={(v) => onCategoryChange(v as Category | "all")}
+            onChange={(e) => onCategoryChange(e.target.value as Category | "all")}
+            className="bg-secondary border-border"
           >
-            <SelectTrigger className="bg-secondary border-border">
-              <SelectValue placeholder="All categories" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All categories</SelectItem>
-              {categories.map((cat) => (
-                <SelectItem key={cat} value={cat}>
-                  {categoryDisplayNames[cat]}
-                </SelectItem>
-              ))}
-            </SelectContent>
+            <SelectItem value="all">All categories</SelectItem>
+            {categories.map((cat) => (
+              <SelectItem key={cat} value={cat}>
+                {categoryDisplayNames[cat]}
+              </SelectItem>
+            ))}
           </Select>
         </div>
 
         <div className="space-y-1.5">
-          <Label className="text-muted-foreground text-xs">From year</Label>
+          <MuiInputLabel className="text-muted-foreground text-xs">From year</MuiInputLabel>
           <Select
             value={yearRange[0].toString()}
-            onValueChange={(v) => onYearRangeChange([parseInt(v ?? "1901"), yearRange[1]])}
+            onChange={(e) => onYearRangeChange([parseInt(e.target.value as string), yearRange[1]])}
+            className="bg-secondary border-border"
           >
-            <SelectTrigger className="bg-secondary border-border">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {Array.from({ length: 13 }, (_, i) => 1901 + i * 10).map((year) => (
-                <SelectItem key={year} value={year.toString()}>
-                  {year}
-                </SelectItem>
-              ))}
-            </SelectContent>
+            {Array.from({ length: 13 }, (_, i) => 1901 + i * 10).map((year) => (
+              <SelectItem key={year} value={year.toString()}>
+                {year}
+              </SelectItem>
+            ))}
           </Select>
         </div>
 
         <div className="space-y-1.5">
-          <Label className="text-muted-foreground text-xs">To year</Label>
+          <MuiInputLabel className="text-muted-foreground text-xs">To year</MuiInputLabel>
           <Select
             value={yearRange[1].toString()}
-            onValueChange={(v) => onYearRangeChange([yearRange[0], parseInt(v ?? "2023")])}
+            onChange={(e) => onYearRangeChange([yearRange[0], parseInt(e.target.value as string)])}
+            className="bg-secondary border-border"
           >
-            <SelectTrigger className="bg-secondary border-border">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {Array.from({ length: 13 }, (_, i) => 1911 + i * 10).map((year) => (
-                <SelectItem key={year} value={year.toString()}>
-                  {year}
-                </SelectItem>
-              ))}
-              <SelectItem value="2023">2023</SelectItem>
-            </SelectContent>
+            {Array.from({ length: 13 }, (_, i) => 1911 + i * 10).map((year) => (
+              <SelectItem key={year} value={year.toString()}>
+                {year}
+              </SelectItem>
+            ))}
+            <SelectItem value="2023">2023</SelectItem>
           </Select>
         </div>
       </div>
