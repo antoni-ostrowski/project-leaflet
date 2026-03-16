@@ -1,0 +1,19 @@
+{
+  "name": "project-leaflet",
+  "private": true,
+  "workspaces": [
+    "packages/**",
+    "apps/**"
+  ],
+  "type": "module",
+  "module": "index.ts",
+  "scripts": {
+    "dev:web": "cd ./apps/web && bun run dev"
+  },
+  "devDependencies": {
+    "vite-plus": "catalog:"
+  },
+  "catalog": {
+    "vite-plus": "^0.1.11"
+  }
+}
