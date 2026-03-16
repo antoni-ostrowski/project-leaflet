@@ -1,4 +1,4 @@
-import { Data, Effect, Option, pipe, Schema, SchemaTransformation } from "effect"
+import { Data, Effect, pipe } from "effect"
 
 /**
  * Creates an Effect from a Promise, handling errors and logging.
@@ -37,38 +37,65 @@ export class ServerError extends Data.TaggedError("ServerError")<{
   }
 }
 
-export const LaureateSchema = Schema.Struct({
-  _id: Schema.String,
-  id: Schema.NumberFromString,
-  firstname: Schema.String,
-  surname: Schema.String,
+export interface Affiliation {
+  name: string
+  city: string
+  country: string
+}
 
-  // Built-in DateTime transformations
-  born: Schema.DateTimeUtcFromString,
-  died: Schema.OptionFromNullOr(Schema.DateTimeUtcFromString),
+export interface Prize {
+  year: string
+  category: string
+  share: string
+  motivation: string
+  // Use optional chaining because some prizes have no affiliations
+  affiliations?: Affiliation[]
+}
 
-  bornCountry: Schema.String,
-  bornCountryCode: Schema.String,
-  bornCity: Schema.String,
+export interface Laureate {
+  _id: string // MongoDB ObjectId string
+  id: string // Internal Nobel ID
+  firstname: string
+  surname: string
+  born: string // "YYYY-MM-DD"
+  died?: string
+  bornCountry: string
+  bornCountryCode: string
+  bornCity: string
+  diedCountry?: string
+  diedCountryCode?: string
+  diedCity?: string
+  gender: "male" | "female" | "org" // Added "org" as some winners are organizations
+  prizes: Prize[]
+}
 
-  diedCountry: Schema.OptionFromNullOr(Schema.String),
-  diedCountryCode: Schema.OptionFromNullOr(Schema.String),
-
-  gender: Schema.Union([Schema.Literal("male"), Schema.Literal("female")]),
-  prizes: Schema.Array(
-    Schema.Struct({
-      year: Schema.NumberFromString,
-      category: Schema.String,
-      share: Schema.NumberFromString,
-      motivation: Schema.String,
-      affiliations: Schema.Array(
-        Schema.Struct({
-          name: Schema.String,
-          city: Schema.String,
-          country: Schema.String
-        })
-      )
-    })
-  )
-})
-export type Laureate = typeof LaureateSchema.Type
+// {
+//     "_id": "699ed4086dc463d0400bc1b2",
+//     "id": "5",
+//     "firstname": "Pierre",
+//     "surname": "Curie",
+//     "born": "1859-05-15",
+//     "died": "1906-04-19",
+//     "bornCountry": "France",
+//     "bornCountryCode": "FR",
+//     "bornCity": "Paris",
+//     "diedCountry": "France",
+//     "diedCountryCode": "FR",
+//     "diedCity": "Paris",
+//     "gender": "male",
+//     "prizes": [
+//       {
+//         "year": "1903",
+//         "category": "physics",
+//         "share": "4",
+//         "motivation": "\"in recognition of the extraordinary services they have rendered by their joint researches on the radiation phenomena discovered by Professor Henri Becquerel\"",
+//         "affiliations": [
+//           {
+//             "name": "École municipale de physique et de chimie industrielles (Municipal School of Industrial Physics and Chemistry)",
+//             "city": "Paris",
+//             "country": "France"
+//           }
+//         ]
+//       }
+//     ]
+// }

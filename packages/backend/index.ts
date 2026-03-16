@@ -1,3 +1,4 @@
+import cors from "cors"
 import express from "express"
 import { MongoClient } from "mongodb"
 
@@ -5,6 +6,7 @@ import { laureatsRouter } from "./endpoints/laureats"
 import { statsRouter } from "./endpoints/stats"
 import { env } from "./env"
 export const app = express()
+app.use(cors())
 const port = 8080
 
 const client = new MongoClient(env.DATABASE_URI)
