@@ -1,6 +1,7 @@
 import { LaureateList } from "@/components/laureats-view/laureats-view"
 import { MapView } from "@/components/map-view/map-view"
 import { Navigation } from "@/components/navigation"
+import { StatsCharts } from "@/components/stats-view/stats-view"
 import { createFileRoute } from "@tanstack/react-router"
 import { useState } from "react"
 
@@ -18,7 +19,7 @@ function App() {
       <main className="container mx-auto px-4 py-6">
         {activeView === "map" && <MapView />}
         {activeView === "laureates" && <LaureateList />}
-        {/* {activeView === "stats" && <StatsCharts />} */}
+        {activeView === "stats" && <StatsCharts />}
       </main>
     </div>
   )
