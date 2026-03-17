@@ -50,6 +50,35 @@ export function useListLaureates(filters: LaureatesFilters = {}) {
 
 const PAGE_SIZE = 50
 
+export interface Country {
+  code: string
+  name: string
+}
+
+export function useCountries() {
+  return useQuery({
+    queryKey: ["countries"],
+    queryFn: async () => {
+      const program = Effect.gen(function* () {
+        const client = yield* HttpClient.HttpClient
+        const url = `${env.VITE_BACKEND_URL}/api/stats/countries`
+        const response = yield* client.get(url)
+        const json = yield* response.json
+        const data = json as unknown as Array<{ _id: string | null; countryCode: string | null }>
+        return data
+          .filter((c) => c._id != null && c.countryCode != null)
+          .map((c) => ({ code: c.countryCode!, name: c._id! }))
+          .sort((a, b) => a.name.localeCompare(b.name))
+      }).pipe(Effect.provide(FetchHttpClient.layer))
+      const result = await Effect.runPromise(program).catch((e) => {
+        console.error("Failed to fetch countries:", e)
+        throw e
+      })
+      return result
+    }
+  })
+}
+
 export function useListLaureatesInfinite(filters: LaureatesFilters = {}) {
   return useInfiniteQuery({
     queryKey: ["laureates", "infinite", filters, PAGE_SIZE],

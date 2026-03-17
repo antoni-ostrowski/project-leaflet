@@ -1,4 +1,4 @@
-import { useListLaureatesInfinite } from "@/hooks/use-laureates"
+import { useCountries, useListLaureatesInfinite } from "@/hooks/use-laureates"
 import { useDebouncedValue } from "@tanstack/react-pacer"
 import { Button } from "@/components/ui/button"
 import { Laureate } from "backend/schemas"
@@ -13,6 +13,7 @@ import { Category } from "./utils"
 export function LaureateList() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<Category | "all">("all")
+  const [selectedCountry, setSelectedCountry] = useState<string | "all">("all")
   const [yearRange, setYearRange] = useState<[number, number]>([1901, 2023])
   const [selectedLaureate, setSelectedLaureate] = useState<Laureate | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
@@ -23,6 +24,13 @@ export function LaureateList() {
     (state) => ({ isPending: state.isPending })
   )
 
+  const { data: countriesData, isLoading: isLoadingCountries, error: countriesError } = useCountries()
+  const countries = countriesData ?? []
+
+  if (countriesError) {
+    console.error("Countries fetch error:", countriesError)
+  }
+
   const {
     data,
     fetchNextPage,
@@ -31,7 +39,8 @@ export function LaureateList() {
     isLoading
   } = useListLaureatesInfinite({
     category: selectedCategory === "all" ? undefined : selectedCategory,
-    search: debouncedSearch || undefined
+    search: debouncedSearch || undefined,
+    country: selectedCountry === "all" ? undefined : selectedCountry
   })
 
   const allLaureates = useMemo(() => {
@@ -62,6 +71,10 @@ export function LaureateList() {
         onSearchChange={setSearchQuery}
         selectedCategory={selectedCategory}
         onCategoryChange={setSelectedCategory}
+        selectedCountry={selectedCountry}
+        onCountryChange={setSelectedCountry}
+        countries={countries}
+        isLoadingCountries={isLoadingCountries}
         yearRange={yearRange}
         onYearRangeChange={setYearRange}
       />
